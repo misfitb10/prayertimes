@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Gebedstijden voor vandaag</title>
+    <meta name="description" content="Gebedstijden op basis van je locatie">
+    <meta name="author" content="Bilal Hussain">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="main.css" />
+</head>
+
+<body>
+<div class="page">
+    <main class="page__main">
+        <article>
+            <h1>Gebedstijden vandaag</h1>
+            <p>Volgens <strong>Hanafi.</strong></p>
+            <p class="noGeolocation">Zonder 'locatietoegang' worden de gebedstijden van Den Haag weergegeven.</p>
+
+            <section class="loading">
+                <span class="loading__text">Een moment geduld aub...</span>
+            </section>
+
+            <section class="error"></section>
+
+            <section class="content-block prayer__data">
+                <p>Het is vandaag <span class="date"></span></p>
+
+                <div class="prayer">
+                    <span class="prayer__label">Fajr:</span> <span class="fajr__time"></span>
+                </div>
+                <div class="prayer">
+                    <span class="prayer__label">Dhuhr:</span> <span class="dhuhr__time"></span>
+                </div>
+                <div class="prayer">
+                    <span class="prayer__label">Asr:</span> <span class="asr__time"></span>
+                </div>
+                <div class="prayer">
+                    <span class="prayer__label">Maghrib:</span> <span class="maghrib__time"></span>
+                </div>
+                <div class="prayer">
+                    <span class="prayer__label">Isha:</span> <span class="isha__time"></span>
+                </div>
+            </section>
+
+            <section class="content-block location">
+                <h2>Jouw locatie</h2>
+                <p>De gebedstijden zijn gebaseerd op jouw locatie.</p>
+                <p>Dit is <em>ongeveer</em> waar jij je bevindt.</p>
+                <div class="location__map"></div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="page__footer">
+        Alle data is afkomstig van <a href="https://aladhan.com/prayer-times-api">www.aladhan.com</a>
+    </footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="prayertimes.js"></script>
+</body>
+</html>

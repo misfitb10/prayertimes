@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    margin: 16px;
+}
+
+/*
+    Typography
+*/
+h1  { font-size: 22px; }
+h2  { font-size: 18px; }
+p   { font-size: inherit; }
+
+.page {
+    margin: 0 auto;
+    max-width: 600px;
+    position: relative;
+}
+
+/*
+    Sections
+*/
+.prayer__data, .noGeolocation, .location {
+    display: none;
+}
+
+.prayer__label {
+    font-weight: bold;
+    display: inline-block;
+    min-width: 125px;
+}
+
+.page__footer {
+    margin-bottom: 50px;
+    font-size: 16px;
+}
+
+/*
+    Generic/helper classes
+*/
+.content-block {
+    margin: 0 0 50px 0;
+}
+
+.loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255,255,255,0.65);
+    text-align: center;
+}
+
+.loading__text {
+    top: 50%;
+    position: relative;
+    background-color: #000;
+    color: #fff;
+    padding: 5px 10px;
+}
+
+.error {
+    color: #ff0000;
+    font-weight: bold;
+}
