@@ -5,8 +5,7 @@ const apiErrorHandler = (() => {
         const errorMessage:string = 'Excuses, er is iets misgegaan met ons systeem. Probeer het later nog eens.';
         loading.classList.add('hide');
         error.textContent = errorMessage;
-        console.error('--- API response failed. ---');
-        console.log('Reason: ', reason);
+        console.error(`API response failed. Reason: ${reason}`);
     };
 
     return {
