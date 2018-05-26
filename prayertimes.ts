@@ -31,7 +31,7 @@ const prayerTimes = (() => {
         city: 'The Hague'
     };
 
-    let timesApiURL:string = baseApiURL + '/timingsByCity?' + util.params(timesApiParams);
+    let timesApiURL:string = `${baseApiURL}/timingsByCity?${util.params(timesApiParams)}`;
 
     // Global because it will get populated through time stamp API call and then used in the prayer times API call
     let timeStamp:string;
@@ -49,7 +49,7 @@ const prayerTimes = (() => {
     };
 
     const showGeoNotification = (): void => {
-        const noGeoLocationText:string = 'Geolocation is not supported by your browser. This means that you can\'t see prayer times based on your location.';
+        const noGeoLocationText:string = `Geolocation is not supported by your browser. This means that you can't see prayer times based on your location.`;
         console.error(noGeoLocationText);
         error.textContent = noGeoLocationText;
         error.classList.add(showClassName);
@@ -76,7 +76,7 @@ const prayerTimes = (() => {
     };
 
     const getTimeStamp = () => {
-        const timeStampURL:string = baseApiURL + '/currentTimestamp?zone=Europe/Amsterdam';
+        const timeStampURL:string = `${baseApiURL}/currentTimestamp?zone=Europe/Amsterdam`;
 
         return fetch(timeStampURL)
             .then((response) => response.json())
@@ -99,7 +99,7 @@ const prayerTimes = (() => {
                 longitude: longitude
             };
 
-            timesApiURL = baseApiURL + '/timings/' + timeStamp + '?' + util.params(params);
+            timesApiURL = `${baseApiURL}/timings/${timeStamp}?${util.params(params)}`;
 
             // Set the location image based on latitude and longitude
             setLocationImage(latitude, longitude);
@@ -167,8 +167,8 @@ const prayerTimes = (() => {
         };
 
         const baseURL:string = 'https://maps.googleapis.com/maps/api/staticmap?';
-        const latLong:string = latitude + ',' + longitude;
-        const url:string = baseURL + 'center=' + latLong + '&' + util.params(params) + '|' + latLong;
+        const latLong:string = `${latitude},${longitude}`;
+        const url:string = `${baseURL}center=${latLong}&${util.params(params)}|${latLong}`;
         locationMap.appendChild(createLocationImage(url));
     };
 
