@@ -6,17 +6,25 @@
 
 import util from './util';
 
-const prayerTimes = (function() {
-    // Global misc consts
-    const loading = document.querySelector('.loading') as HTMLDivElement;
-    const error = document.querySelector('.error') as HTMLDivElement;
-    const showClassName:string = 'show';
+// Interfaces
+// import IGeo from './interfaces/IGeo';
+import IGoogleMapsParams from './interfaces/IGoogleMapsParams';
+import IPrayerTimesParams from "./interfaces/IPrayerTimesParams";
 
+// Constants
+import { error, loading, showClassName } from "./constants";
+
+// Generic API Error Handler
+import apiErrorHandler from './apiErrorHandler';
+
+
+
+const prayerTimes = (() => {
     // The base URL for every API call
     const baseApiURL:string = 'http://api.aladhan.com/v1';
 
     // Default timesApiURL. This will be loaded when the user doesn't want to enable geolocation
-    const timesApiParams:object = {
+    const timesApiParams:IPrayerTimesParams = {
         school: 1,
         method: 2,
         country: 'The Netherlands',
@@ -26,55 +34,62 @@ const prayerTimes = (function() {
     let timesApiURL:string = baseApiURL + '/timingsByCity?' + util.params(timesApiParams);
 
     // Global because it will get populated through time stamp API call and then used in the prayer times API call
-    let timeStamp:string = "";
+    let timeStamp:string;
 
 
 
     // If the browser doesn't support geolocation, show the user a fitting message
-    const checkGeoSupported = function() {
+    const checkGeoSupported = (): void => {
         if (!navigator.geolocation){
-            const noGeoLocationText:string = 'Geolocation is not supported by your browser. This means that you can\'t see prayer times based on your location.';
-            console.log(noGeoLocationText);
-            error.textContent = noGeoLocationText;
-            error.classList.add(showClassName);
+            showGeoNotification();
+            return;
+        } else {
+            navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
         }
     };
 
-    const geoSuccess = function(position:any) {
-        // Geo success is when the user has chosen for geolocation
+    const showGeoNotification = (): void => {
+        const noGeoLocationText:string = 'Geolocation is not supported by your browser. This means that you can\'t see prayer times based on your location.';
+        console.error(noGeoLocationText);
+        error.textContent = noGeoLocationText;
+        error.classList.add(showClassName);
+    };
+
+    // Geo success is when the user has chosen for geolocation
+    const geoSuccess = (position: any): void => {
         const latitude  = position.coords.latitude;
         const longitude = position.coords.longitude;
 
         // If there is a latitude and longitude,
         // get the timestamp needed first, then load the prayer times API
         if (latitude && longitude) {
-            getTimeStamp().then(function() {
+            getTimeStamp().then(() => {
                 getPrayerTimes(latitude, longitude).then(showLocationImage);
             })
         }
     };
 
-    const geoError = function() {
-        // Load default getTimesApi, because timestamp is only needed for geolocation
+    const geoError = (): void => {
+        // Load default getPrayerTimes, because timestamp is only needed for geolocation
         // then show the message of the default The Hague prayer times; "Zonder 'locatietoegang'..."
         getPrayerTimes().then(showFixedLocationMessage);
     };
 
-    const getTimeStamp = function() {
+    const getTimeStamp = () => {
         const timeStampURL:string = baseApiURL + '/currentTimestamp?zone=Europe/Amsterdam';
 
         return fetch(timeStampURL)
             .then((response) => response.json())
             .then((responseJSON) => onGetTimeStampSuccess(responseJSON))
-            .catch(() => handleError)
+            .catch(apiErrorHandler.init)
     };
 
-    const onGetTimeStampSuccess = function(response:any) {
+    const onGetTimeStampSuccess = (response: any): void => {
         // Set timeStamp let to response.data, because we need to use this let in the getPrayerTimes function
         timeStamp = response.data;
     };
 
-    const getPrayerTimes = function(latitude?:number, longitude?:number) {
+    const getPrayerTimes = (latitude?: number, longitude?: number) => {
         // If there is a latitude and longitude, set the timesApiURL to a different API endpoint
         if (latitude && longitude) {
             const params:object = {
@@ -93,10 +108,10 @@ const prayerTimes = (function() {
         return fetch(timesApiURL)
             .then((response) => response.json())
             .then((responseJSON) => onGetPrayerSuccess(responseJSON))
-            .catch(() => handleError)
+            .catch(apiErrorHandler.init)
     };
 
-    const onGetPrayerSuccess = function(getPrayerTimesResponse:any) {
+    const onGetPrayerSuccess = (getPrayerTimesResponse: any): void => {
         setDate(getPrayerTimesResponse);
         setPrayers(getPrayerTimesResponse);
         hideLoading();
@@ -104,14 +119,14 @@ const prayerTimes = (function() {
     };
 
     // Set today's date
-    const setDate = function(getPrayerTimesResponse:any) {
+    const setDate = (getPrayerTimesResponse: any) => {
         const date = document.querySelector('.date') as HTMLSpanElement;
         const responseDate = getPrayerTimesResponse.data.date;
         date.textContent = responseDate.hijri.date + ' / ' + responseDate.gregorian.date;
     };
 
     // Populate the 5 prayers with API data
-    const setPrayers = function(getPrayerTimesResponse:any) {
+    const setPrayers = (getPrayerTimesResponse: any) => {
         // These are the 5 prayers (elements) which will get populated by the API
         const fajr = document.querySelector('.fajr__time') as HTMLSpanElement;
         const dhuhr = document.querySelector('.dhuhr__time') as HTMLSpanElement;
@@ -127,67 +142,62 @@ const prayerTimes = (function() {
         isha.textContent = responseTimings.Isha;
     };
 
-    // Hide loading element, then show prayer data
-    const hideLoading = function() {
-        loading.classList.add('hide');
-    };
+    // Hide loading element
+    const hideLoading = (): void => loading.classList.add('hide');
 
-    const showPrayerData = function() {
+    // Show prayer data by adding a showing class (which makes it `display: block`)
+    const showPrayerData = (): void => {
         const prayerData = document.querySelector('.prayer__data') as HTMLElement;
         prayerData.classList.add(showClassName)
     };
 
-    // Show fixed location message. This is the default message of "Zonder 'locatietoegang'..."
-    const showFixedLocationMessage = function() {
+    // Show fixed location message by adding a showing class (which makes it `display: block`)
+    const showFixedLocationMessage = (): void => {
         const noGeoEl = document.querySelector('.noGeolocation') as HTMLParagraphElement;
         noGeoEl.classList.add(showClassName);
     };
 
     // Set Google Maps Static Image to show the user where we think he is
-    const setLocationImage = function(latitude:number, longitude:number) {
+    const setLocationImage = (latitude: number, longitude: number): void => {
         const locationMap = document.querySelector('.location__map') as HTMLDivElement;
-        const params:object = {
+        const params:IGoogleMapsParams = {
             zoom: 15,
             size: '300x300',
             markers: 'color:green'
         };
 
         const baseURL:string = 'https://maps.googleapis.com/maps/api/staticmap?';
-        const latLong = latitude + ',' + longitude;
-        const url:string = baseURL + 'center=' + latLong + "&" + util.params(params) + '|' + latLong;
-        const locationImg = document.createElement("img");
-        locationImg.alt = "user location";
-        locationImg.src = url;
-        locationMap.appendChild(locationImg);
+        const latLong:string = latitude + ',' + longitude;
+        const url:string = baseURL + 'center=' + latLong + '&' + util.params(params) + '|' + latLong;
+        locationMap.appendChild(createLocationImage(url));
     };
 
-    const showLocationImage = function() {
+    // Create `<img>` tag which contains an alt attribute and the source (url)
+    // The url comes from setLocationImage
+    const createLocationImage = (url: string) => {
+        const locationImg = document.createElement('img');
+        locationImg.alt = 'locatie';
+        locationImg.src = url;
+
+        return locationImg;
+    };
+
+    // Show location by adding a showing class (which makes it `display: block`)
+    const showLocationImage = (): void => {
         const location = document.querySelector('.location') as HTMLDivElement;
         location.classList.add(showClassName);
     };
 
-    // Generic error handler for API calls
-    const handleError = function(jqXHR:any, textStatus:any, errorThrown:any) {
-        const errorMessage:string = 'Excuses, er is iets misgegaan met ons systeem. Probeer het later nog eens.';
-        loading.classList.add('hide');
-        error.textContent = errorMessage;
-        console.error('--- API response failed. ---');
-        console.log('jqXHR: ', jqXHR);
-        console.log('textStatus: ', textStatus);
-        console.log('errorThrown: ', errorThrown);
-        console.log('----------------------------');
-    };
-
-    const initGeo = function() {
-        checkGeoSupported();
-        navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
-    };
+    // We can actually get rid of init, because in the return, we can do init: checkGeoSupported
+    // But this is future-proof. We can add more methods to the init if we want to
+    const init = (): void => checkGeoSupported();
 
     return {
-        init: initGeo
+        init: init
     }
 })();
 
-(function() {
-    prayerTimes.init();
-})();
+
+
+// Is this readable?
+( () => prayerTimes.init() )();
