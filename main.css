@@ -20,8 +20,8 @@ p   { font-size: inherit; }
 /*
     Sections
 */
-.prayer__data, .noGeolocation, .location {
-    opacity: 0;
+.prayer__data, .noGeolocation, .location, .error {
+    display: none;
 }
 
 .prayer__label {
@@ -63,13 +63,13 @@ p   { font-size: inherit; }
 .error {
     color: #ff0000;
     font-weight: bold;
-    opacity: 0;
+    margin: 15px 0;
 }
 
 .show {
-    opacity: 1;
+    display: block;
 }
 
 .hide {
-    opacity: 0;
+    display: none;
 }
